@@ -56,32 +56,56 @@ Bastion-Godmode/
 
 ## Liste des fichiers docs/ (numérotation chronologique – 04/07/2026)
 
-| N°  | Nom du fichier                                 | Statut   | Contenu principal                              |
-| --- | ---------------------------------------------- | -------- | ---------------------------------------------- |
-| 00  | Backup & réinstallation Prodesk                | Terminé  | Procédure complète de backup et réinstallation |
-| 01  | Architecture & Sommaire du Vault Obsidian      | À jour   | Ce fichier (sommaire global)                   |
-| 02  | Network                                        | À jour   | Schéma réseau + interfaces OPNsense            |
-| 03  | État actuel du Firewall                        | En cours | Règles globales actuelles                      |
-| 04 | Firewall Rules Hardening & Cleanup             | En cours | Version détaillée avec logs et tableaux        |
-| 04b | 04b - VLANs et Segmentation Réseau               | En cours | VLANs                                          |
-| 05  | État de la machine Prodesk (Bastion Godmode)   | Terminé  | Hardware, software, état actuel                |
-| 06  | Aliases OPNsense                               | Terminé  | Liste complète des aliases                     |
-| 07  | Hardening du Bastion Godmode                   | Terminé  | Hardening global                               |
-| 07b | Hardening du Bastion Godmode                   | Terminé  | Version détaillée                              |
-| 07C | Pentest Externe Contrôlé                       | En cours | Tests d’attaque contrôlés                      |
-| 08  | BunkerWeb Install                              | Terminé  | Installation et config de base                 |
-| 09  | Suricata (Intrusion Detection) sur OPNsense    | En cours | Configuration IDS                              |
-| 10  | Accès SSH sécurisé depuis AlphaDeck            | Terminé  | Configuration SSH durcie                       |
-| 11  | BunkerWeb configuration finale + virtual hosts | À faire  | Configuration multisite + HTTPS                |
-| 11b | Configuration Port Forwarding sur Nordnet      | En cours | Règles NAT Nordnet                             |
+| N°  | Nom du fichier                                            | Statut     | Contenu principal                              |
+| --- | --------------------------------------------------------- | ---------- | ---------------------------------------------- |
+| 00  | Backup & réinstallation Prodesk                           | Terminé    | Procédure complète de backup et réinstallation |
+| 01  | Architecture & Sommaire du Vault Obsidian                 | À jour     | Ce fichier (sommaire global)                   |
+| 02  | Network                                                   | À jour     | Schéma réseau + interfaces OPNsense            |
+| 03  | État actuel du Firewall                                   | En cours   | Règles globales actuelles                      |
+| 04  | Firewall Rules Hardening & Cleanup                        | En cours   | Version détaillée avec logs et tableaux        |
+| 04b | 04b - VLANs et Segmentation Réseau                        | En cours   | VLANs                                          |
+| 05  | État de la machine Prodesk (Bastion Godmode)              | Terminé    | Hardware, software, état actuel                |
+| 06  | Aliases OPNsense                                          | Terminé    | Liste complète des aliases                     |
+| 07  | Hardening du Bastion Godmode                              | Terminé    | Hardening global                               |
+| 07b | Hardening du Bastion Godmode                              | Terminé    | Version détaillée                              |
+| 07C | Pentest Externe Contrôlé                                  | En cours   | Tests d’attaque contrôlés                      |
+| 08  | BunkerWeb Install                                         | Terminé    | Installation et config de base                 |
+| 09  | Suricata (Intrusion Detection) sur OPNsense               | En cours   | Configuration IDS                              |
+| 10  | Accès SSH sécurisé depuis AlphaDeck                       | Terminé    | Configuration SSH durcie                       |
+| 11  | BunkerWeb configuration finale + virtual hosts            | À faire    | Configuration multisite + HTTPS                |
+| 11b | Configuration Port Forwarding sur Nordnet                 | En cours   | Règles NAT Nordnet                             |
+| 12  | Domaine & Messagerie externe (horus-ais.com + OVH Zimbra) | ✅ Terminé  |                                                |
+| 12a | Mise en service de la messagerie OVH Zimbra               | ✅ Terminé  | SPF/DKIM/DMARC OK                              |
+| 13  | Installation Zsh + Starship + Grok Build (Prodesk)        | ✅ Terminé  |                                                |
+| 13a | Version détaillée Zsh/Starship/Grok Build                 | ✅ Terminé  |                                                |
+| 14  | Inventaire Hardware & Ressources des machines             | ✅ Terminé  |                                                |
+| 15  | Objectif du Cloudflare Tunnel                             | ✅ Terminé  |                                                |
+| 16  | Installer cloudflared sur Debian                          | ✅ Terminé  |                                                |
+| 16a | Installer cloudflared et Cloudflare Tunnel (Prodesk)      | ✅ Terminé  | Version synthétique                            |
+| 17  | Checklist réinstallation Debian avec LUKS                 | ⏳ Prêt     | Pas encore exécuté                             |
+| 18  | Est-ce que BunkerWeb protège vraiment ta page index       | ✅ Terminé  | Analyse / tests                                |
+| 18A | Alignement projet Bastion Godmode (30 juillet 2026)       | ✅ Terminé  | Point de référence                             |
+| 19  | Migration des règles Firewall OPNsense vers MVC_API       | ✅ Terminé  |                                                |
+| 19A | Optimisation STUN/TURN + alias                            | ✅ Terminé  |                                                |
+| 20  | Hardening cloudflared – utilisateur dédié non-root        | ✅ Terminé  |                                                |
+| 20a | Version synthétique hardening cloudflared                 | ✅ Terminé  |                                                |
+| 21  | Multisite BunkerWeb                                       | ✅ Terminé  |                                                |
+| 21a | Version synthétique Multisite BunkerWeb                   | ✅ Terminé  |                                                |
+| 21b | Redirection mrdoolux.brave (Unstoppable)                  | ⏳ En cours | Pending validation Unstoppable                 |
 
+12Domaine & Messagerie externe (horus-ais.com + OVH Zimbra)✅ Terminé
 ## Fichiers à créer prochainement (ordre logique recommandé)
 
-- **11** - BunkerWeb configuration finale + virtual hosts + HTTPS Let’s Encrypt
-- **12** - OpenVPN / WireGuard serveur + clients
-- **13** - Wazuh SIEM (manager + agents)
-- **14** - Intégration Suricata → Wazuh (EVE JSON)
-- **15** - Monitoring global + alerting (NetFlow, Insight, Wazuh)
+|       |                                                        |                                                          |
+| ----- | ------------------------------------------------------ | -------------------------------------------------------- |
+| Ordre | Fichier proposé                                        | Objectif                                                 |
+| 22    | 22 - Redirection Unstoppable mrdoolux.brave (final).md | Clôturer proprement la redirection Web3 une fois validée |
+| 23    | 23 - Contenu site horus-ais.com & mrdoolux.md          | Structure + premières pages réelles                      |
+| 24    | 24 - Mise en service GX10 (OPT2).md                    | IP, firewall, isolation                                  |
+| 25    | 25 - WireGuard VPN (accès distant).md                  | Accès sécurisé depuis l’extérieur                        |
+| 26    | 26 - Wazuh lab léger (Prodesk).md                      | SIEM de démonstration                                    |
+| 27    | 27 - Clone système + préparation 2e machine.md         | Avant LUKS / machine dédiée                              |
+| 28    | 28 - Activation LUKS Prodesk.md                        | Exécution de la checklist 17                             |
 
 ## Règles de documentation (à respecter)
 
