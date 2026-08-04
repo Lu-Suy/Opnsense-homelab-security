@@ -108,5 +108,4 @@ Une fois la transaction confirmée, `mrdoolux.brave` redirigera vers `https://mr
 
 ---
 
-Tu veux que je te redonne le code HTML plus clairement, ou tu l’as déjà ?  
-Dis-moi quand tu as uploadé et signé.
+
