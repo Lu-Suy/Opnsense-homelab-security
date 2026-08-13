@@ -43,7 +43,7 @@ Homelab durci : firewall, segmentation, IDS, WAF, exposition web **sans port-for
 | Hostname | Backend | Contenu |
 |----------|---------|---------|
 | `horus-ais.com` / `www` | BunkerWeb | Page principale |
-| `mrdoolux.horus-ais.com` | BunkerWeb | Sous-domaine pro / CV |
+| `mrdoolux.horus-ais.com` | BunkerWeb | Tests |
 | `mrdoolux.brave` (Web3) | Redirection → Web2 | En cours (Unstoppable) |
 
 ---
