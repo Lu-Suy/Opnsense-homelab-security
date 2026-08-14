@@ -1,7 +1,6 @@
 
-### Ce que tu as déjà
 
-Tu as un **site Web2 classique** qui fonctionne :
+J'ai un **site Web2 classique** qui fonctionne :
 ```
 https://mrdoolux.horus-ais.com
 ```
@@ -41,7 +40,7 @@ Si tu n’as pas d’intérêt particulier pour le branding Web3, on peut très 
 ---
 
 
-### On attaque Unstoppable
+### A faire sur Unstoppable
 
 1. Connecte-toi sur [https://unstoppabledomains.com](https://unstoppabledomains.com)
 2. Va dans **My Domains**
