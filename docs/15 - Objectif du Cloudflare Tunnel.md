@@ -119,7 +119,7 @@ Quand le statut passe à **Active**, Cloudflare t’envoie généralement un ema
 Observe ce que tu vois actuellement comme statut sur Cloudflare (Pending / Active / autre).
 
 ![capture](../images/Pasted%20image%2020260730142638.png)
-**C’est parfait !**
+
 
 Le domaine `horus-ais.com` est déjà **Active**.  
 Cloudflare a détecté le changement de nameservers très rapidement (ça arrive souvent quand la propagation est bonne).
