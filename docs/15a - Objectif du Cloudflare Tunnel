@@ -64,9 +64,9 @@ Création / connexion au compte Cloudflare :
 
 1. Dans le dashboard Cloudflare : **Add a domain** / **Add site**
 2. Saisir :
-   ```text
+
    horus-ais.com
-   ```
+
 3. Continuer
 4. Choisir le plan **Free**
 5. Laisser Cloudflare scanner les DNS existants, puis confirmer
@@ -143,4 +143,3 @@ Cette partie est documentée dans :
 **Dernière mise à jour** : août 2026  
 **Statut** : DNS Cloudflare opérationnel – tunnel documenté dans les fiches 16 et 20
 
----
