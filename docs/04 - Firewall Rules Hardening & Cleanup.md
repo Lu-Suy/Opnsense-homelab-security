@@ -10,7 +10,7 @@
 | ------------------- | ---------- | ----------------------------------------------------------------------------------------------- | --------------------------------------- |
 | Alpha_4_Deck        | Host       | 10.0.0.10/24                                                                                    | Admin_Opnsense                          |
 | Prodesk_Manager     | Hosts      | 10.0.10.11                                                                                      | Règles SSH Prodesk                      |
-| Prodesk_web_service | Hots       | 10.0.10.10                                                                                      | Règle WEB Services                      |
+| Prodesk_web_service | Host       | 10.0.10.10                                                                                      | Règle WEB Services                      |
 | **GX10**            | Hosts      | 10.0.20.10                                                                                      | Règles OPT2 (machine haute performance) |
 | **DNS_External**    | Host(s)    | 1.1.1.1 1.0.0.1 9.9.9.9                                                                         | DNS externes fiables                    |
 | **NTP_Servers**     | Host(s)    | 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org time.cloudflare.com time.google.com | Serveurs NTP                            |
@@ -39,11 +39,11 @@ Aucune règle manuelle nécessaire (comportement par défaut = tout bloquer).
 **Actions concrètes** :
 
 - **Backup complet OPNsense** :
-    - Va dans **System → Configuration → Backups**
-    - Fais un backup manuel + active les backups automatiques (quotidiens).
+    - Dans **System → Configuration → Backups**
+    - Faire un backup manuel + activer les backups automatiques (quotidiens).
 - **Accès admin sécurisé (anti-lockout)** :
-    - Crée une règle Firewall spécifique sur **WAN** (très restrictive) :
-        - Source : ton IP publique actuelle (ou une plage /32)
+    - Créer une règle Firewall spécifique sur **WAN** (très restrictive) :
+        - Source : mon IP publique actuelle (ou une plage /32)
         - Destination : This Firewall
         - Port : 443 (HTTPS) ou 22 (SSH)
         - Description : "Admin Access Emergency"
@@ -57,13 +57,13 @@ Aucune règle manuelle nécessaire (comportement par défaut = tout bloquer).
 ### 2. Règles Interface **LAN** (10.0.0.0/24) – Clients de confiance
 (Règles à placer sur l’onglet **LAN** dans OPNsense)
 
-J’ai analysé **ligne par ligne** ta nouvelle capture d’écran du **Firewall → Rules → LAN**.
-Tout bien appliqué :
+Capture d’écran du **Firewall → Rules → LAN**.
+Tout est bien appliqué :
 
 - Les règles BunkerWeb (80 + 443) sont maintenant **correctement pointées sur Prodesk_Web_Service** (et non plus sur Manager).
 - SSH est **ultra-restreint** à AlphaDeck uniquement.
-- Tu as ajouté la règle **Block All** tout en bas (c’est la plus importante pour le durcissement).
-- Tu as activé les **logs sur toutes les règles** → parfait pour la traçabilité et Wazuh plus tard.
+- J'ai ajouté la règle **Block All** tout en bas (c’est la plus importante pour le durcissement).
+- J'ai activé les **logs sur toutes les règles** → parfait pour la traçabilité et Wazuh plus tard.
 - L’alias **AlphaDeck** = 10.0.0.10 (même chose que Admin-Workstations) → nickel.
 
 | Ordre | Action | Protocole | Source             | Destination         | Port         | Description                                       | Log | Statut |
@@ -182,7 +182,7 @@ Voici les points qu’on peut améliorer pour rendre l’isolation **encore plus
 
 ## 4. Cleanup-plan – Nettoyage de la Prodesk (21/05/2026)
 
-**Objectif** (inspiré dossier Eric Dupaud) :  
+**Objectif**:  
 Faire un vrai ménage avant BunkerWeb multisite + Wazuh. Libérer l’espace, nettoyer les logs, préparer les dossiers pour le SIEM.
 
 **État matériel** : Prodesk 600 Mini G2 – Ryzen 7, 16 Go RAM, SSD 1 To → largement suffisant.
