@@ -47,12 +47,12 @@ C’est la méthode la plus propre pour exploiter correctement Cloudflare Tunnel
 | Philosophie | Web3 / privacy marketing | Infrastructure web mature |
 | WHOIS | Moins classique | Classique, masquable |
 | Maturité | Plus jeune | Très éprouvé en production |
-| Contrôle DNS | Plus limité | Excellent |
-| Sécurité / Tunnel | Pas natif | Excellent |
+| Contrôle DNS | Plus limité (pas de SRV, moins de flexibilité)| Excellent |
+| Sécurité / Tunnel | Pas natif | Excellent (Cloudflare Tunnel + WAF) |
 
 **En résumé** :
-- Unstoppable convient bien à une logique Web3 / branding
-- Cloudflare est nettement plus adapté pour une exposition web sécurisée et opérationnelle
+- Unstoppable est plus « privacy-oriented » sur le papier (Web3).
+- Cloudflare est **beaucoup plus puissant et fiable** pour ce qu’on veut faire (Tunnel, protection, DNS avancé). Beaucoup de gens sérieux en cybersécurité l’utilisent justement parce qu’il est robuste.
 
 ---
 
