@@ -116,7 +116,7 @@ Il doit être encore en **Pending** (en attente).
 
 Quand le statut passe à **Active**, Cloudflare t’envoie généralement un email, et tu verras le statut changer dans le dashboard.
 
-Dis-moi ce que tu vois actuellement comme statut sur Cloudflare (Pending / Active / autre).
+Observe ce que tu vois actuellement comme statut sur Cloudflare (Pending / Active / autre).
 
 ![capture](../images/Pasted%20image%2020260730142638.png)
 **C’est parfait !**
@@ -124,7 +124,7 @@ Dis-moi ce que tu vois actuellement comme statut sur Cloudflare (Pending / Activ
 Le domaine `horus-ais.com` est déjà **Active**.  
 Cloudflare a détecté le changement de nameservers très rapidement (ça arrive souvent quand la propagation est bonne).
 
-Tu es bon de ce côté-là.
+
 
 ### Prochaine étape : installer Cloudflare Tunnel sur la Prodesk
 
