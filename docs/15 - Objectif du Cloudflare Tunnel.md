@@ -1,133 +1,150 @@
 
+# 15 - Objectif du Cloudflare Tunnel
 
-### Objectif du Cloudflare Tunnel
-
-Permettre d’accéder de l’extérieur (et de te montrer) le site servi par BunkerWeb sur la Prodesk (10.0.10.10) de façon sécurisée, sans port forwarding classique.
-
-
-### 1. Est-ce que `horus-ais.com` est encore chez Unstoppable ?
-Oui, d’après tout ce qu’on a documenté jusqu’ici, le domaine est toujours enregistré chez **Unstoppable Domains**.
-
-### 2. Unstoppable vs Cloudflare : lequel est plus « confidentiel » ?
-
-| Critère                    | Unstoppable Domains                  | Cloudflare                          |
-|---------------------------|--------------------------------------|-------------------------------------|
-| **Philosophie**           | Web3 / blockchain, marketing privacy | Grande entreprise US, très utilisée |
-| **WHOIS**                 | Moins classique, orientation privacy | WHOIS classique (mais on peut le masquer) |
-| **Confiance / maturité**  | Plus jeune, moins éprouvé pour de l’infra sérieuse | Très mature, énormément utilisé en production |
-| **Contrôle DNS**          | Limité (pas de SRV, moins de flexibilité) | Excellent |
-| **Sécurité / Tunnel**     | Pas natif                            | Excellent (Cloudflare Tunnel + WAF) |
-
-**En résumé clair :**
-- Unstoppable est plus « privacy-oriented » sur le papier (Web3).
-- Cloudflare est **beaucoup plus puissant et fiable** pour ce qu’on veut faire (Tunnel, protection, DNS avancé). Beaucoup de gens sérieux en cybersécurité l’utilisent justement parce qu’il est robuste.
-
-### 3. Est-ce que je suis obligé de le mettre chez Cloudflare ?
-
-**Non, ce n’est pas obligatoire**, mais c’est **fortement recommandé**.
-
-Deux possibilités :
-
-| Option | Avantage | Inconvénient |
-|--------|----------|--------------|
-| **Garder chez Unstoppable** + Cloudflare Tunnel | Tu ne changes pas de registrar | Plus limité, configuration un peu plus bricolée |
-| **Déplacer les nameservers vers Cloudflare** (recommandé) | Meilleure intégration, plus simple, plus de puissance (Proxy orange, WAF, analytics, etc.) | Tu « déclares » le domaine chez Cloudflare |
-
-**Ma recommandation pour le projet Bastion Godmode :**
-On passe les **nameservers** de `horus-ais.com` chez Cloudflare.  
-Tu gardes le domaine acheté chez Unstoppable (tu restes propriétaire), mais tu confies la gestion DNS à Cloudflare. C’est la méthode standard et la plus propre.
+**Date** : juillet 2026  
+**Objectif** : exposer de façon sécurisée le site servi par BunkerWeb sur la Prodesk (`10.0.10.10`), sans port-forwarding classique sur la box FAI ni sur OPNsense.
 
 ---
 
+## Contexte
+
+L’objectif n’est pas seulement de rendre un site accessible depuis l’extérieur.  
+Il s’agit de le faire avec une surface d’attaque réduite :
+
+- aucun port 80/443 ouvert localement
+- IP publique non exposée directement
+- TLS géré côté Cloudflare
+- accès entrant contrôlé via tunnel
+
+**Approche retenue** : Cloudflare Tunnel (`cloudflared` sur la Prodesk).
+
+---
+
+## 1. Situation du domaine `horus-ais.com`
+
+Le domaine `horus-ais.com` était initialement côté **Unstoppable Domains**.
+
+Deux options étaient possibles :
+
+| Option | Avantage | Inconvénient |
+|--------|----------|--------------|
+| Garder Unstoppable + Cloudflare Tunnel | Pas de changement de registrar | Intégration plus limitée |
+| Passer les nameservers vers Cloudflare | Meilleure intégration DNS, Tunnel, WAF, proxy | Gestion DNS déléguée à Cloudflare |
+
+### Choix retenu
+
+Les **nameservers** de `horus-ais.com` ont été basculés vers Cloudflare.
+
+Le domaine reste la propriété du titulaire, mais la gestion DNS est confiée à Cloudflare.  
+C’est la méthode la plus propre pour exploiter correctement Cloudflare Tunnel.
+
+---
+
+## 2. Unstoppable vs Cloudflare
+
+| Critère | Unstoppable Domains | Cloudflare |
+|---------|---------------------|------------|
+| Philosophie | Web3 / privacy marketing | Infrastructure web mature |
+| WHOIS | Moins classique | Classique, masquable |
+| Maturité | Plus jeune | Très éprouvé en production |
+| Contrôle DNS | Plus limité (pas de SRV, moins de flexibilité)| Excellent |
+| Sécurité / Tunnel | Pas natif | Excellent (Cloudflare Tunnel + WAF) |
+
+**En résumé** :
+- Unstoppable est plus « privacy-oriented » sur le papier (Web3).
+- Cloudflare est **beaucoup plus puissant et fiable** pour ce qu’on veut faire (Tunnel, protection, DNS avancé). Beaucoup de gens sérieux en cybersécurité l’utilisent justement parce qu’il est robuste.
+
+---
+
+## 3. Mise en place Cloudflare
+
 ### Étape 1 – Compte Cloudflare
 
-1. Est-ce que tu as **déjà un compte Cloudflare** ?
-2. Si non, crée-en un ici : [https://dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
+Création / connexion au compte Cloudflare :  
+[https://dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
 
-Une fois que tu es connecté (ou que tu as créé le compte), dis-moi :
+### Étape 2 – Ajout du domaine
 
-> « Je suis connecté à Cloudflare »
-
-Ensuite on passera à l’ajout du domaine `horus-ais.com` et au changement des nameservers chez Unstoppable.
-
-### Étape 2 – Ajouter le domaine `horus-ais.com` dans Cloudflare
-
-1. Dans le dashboard Cloudflare, clique sur **“Add a domain”** ou **“Onboard a domain”** (ou “Add site”).
-2. Tape exactement :  
-   ```
+1. Dans le dashboard Cloudflare : **Add a domain** / **Add site**
+2. Saisir :
+   ```text
    horus-ais.com
    ```
-3. Clique sur **Continue**.
-4. Choisis le plan **Free** (c’est largement suffisant pour ce qu’on fait).
-5. Cloudflare va scanner les DNS existants. Laisse-le faire, puis clique sur **Continue** / **Confirm DNS records**.
+3. Continuer
+4. Choisir le plan **Free**
+5. Laisser Cloudflare scanner les DNS existants, puis confirmer
 
+![Capture ajout domaine Cloudflare](../images/Pasted%20image%2020260730141503.png)
 
-![capture](../images/Pasted%20image%2020260730141503.png)
+---
 
+## 4. Changement des nameservers chez Unstoppable
 
-Une fois arrivé à l’écran qui te montre les **deux nameservers Cloudflare** (du style `xxxx.ns.cloudflare.com`),
+Une fois les nameservers Cloudflare affichés, la bascule se fait côté Unstoppable :
 
-### Ce qu’il faut faire :
+1. Ouvrir le menu **Nameservers**
+2. Passer en mode **Custom**
+3. Renseigner les nameservers Cloudflare, par exemple :
+   ```text
+   armando.ns.cloudflare.com
+   sonia.ns.cloudflare.com
+   ```
+4. Enregistrer
 
-Regarde dans le menu de gauche de ta capture :
+![Capture nameservers Unstoppable](../images/Pasted%20image%2020260730141644.png)
 
-Tu as clairement l’entrée **Nameservers** (juste en dessous de DNS Records).
+### Point important
 
-1. Clique sur **Nameservers** (dans le menu de gauche).
-2. Là tu auras le choix entre les nameservers Unstoppable (par défaut) et **Custom**.
-3. Passe en **Custom**.
-4. Mets les deux de Cloudflare :
+Les records NS visibles dans “DNS Records” ne sont pas la bonne zone de modification.  
+Le changement se fait bien dans le paramètre **Nameservers** du domaine.
 
-```
-armando.ns.cloudflare.com
-sonia.ns.cloudflare.com
-```
+![Capture confirmation nameservers](../images/Pasted%20image%2020260730142123.png)
 
-![capture](../images/Pasted%20image%2020260730141644.png)
+Après bascule en custom nameservers, Unstoppable indique en général :
 
-5. Sauvegarde.
+> DNS management is unavailable when custom nameservers are set
 
-Les records NS que tu vois dans « DNS Records » sont juste l’affichage des nameservers actuels.  
-On ne les modifie **pas** en ajoutant de nouveaux records NS. On change le paramètre **Nameservers** du domaine.
+C’est le comportement attendu :
+- Unstoppable ne gère plus le DNS
+- toute la gestion DNS passe par Cloudflare
 
-![capture](../images/Pasted%20image%2020260730142123.png)
+---
 
+## 5. Validation du statut Cloudflare
 
-**C’est parfaitement normal et attendu.**
+Après propagation, le domaine doit passer de **Pending** à **Active** dans Cloudflare.
 
-Dès que tu passes en **Custom Nameservers**, Unstoppable te dit :
+Le délai peut aller de quelques minutes à plusieurs heures selon la propagation DNS.
 
-> « DNS management is unavailable when custom nameservers are set »
+![Capture statut Active](../images/Pasted%20image%2020260730142638.png)
 
-C’est **exactement** ce qu’on voulait.
+Dans ce cas, le domaine `horus-ais.com` est passé rapidement en **Active**.
 
-À partir de maintenant :
-- Unstoppable ne gère plus les DNS de `horus-ais.com`
-- Toute la gestion DNS se fait **uniquement dans Cloudflare**
+---
 
-C’est le comportement correct.
+## 6. Suite logique
 
-### Prochaine étape
+Une fois le DNS opérationnel chez Cloudflare, l’étape suivante consiste à installer et configurer `cloudflared` sur la Prodesk, afin de créer le tunnel vers BunkerWeb.
 
-Va dans ton dashboard Cloudflare et regarde le statut du domaine `horus-ais.com`.
+Cette partie est documentée dans :
 
-Il doit être encore en **Pending** (en attente).  
-Ça peut prendre de quelques minutes à plusieurs heures (parfois jusqu’à 24h, mais souvent beaucoup plus rapide).
+- [16 – Installer cloudflared et Cloudflare Tunnel (Prodesk)](./16%20-%20Installer%20cloudflared%20et%20Cloudflare%20Tunnel%20(Prodesk).md)
+- [20 – Hardening cloudflared – utilisateur dédié non-root](./20%20-%20Hardening%20cloudflared%20-%20utilisateur%20dédié%20non-root.md)
 
-Quand le statut passe à **Active**, Cloudflare t’envoie généralement un email, et tu verras le statut changer dans le dashboard.
+---
 
-Dis-moi ce que tu vois actuellement comme statut sur Cloudflare (Pending / Active / autre).
+## Résultat attendu
 
-![capture](../images/Pasted%20image%2020260730142638.png)
-**C’est parfait !**
+À ce stade :
 
-Le domaine `horus-ais.com` est déjà **Active**.  
-Cloudflare a détecté le changement de nameservers très rapidement (ça arrive souvent quand la propagation est bonne).
+- le domaine est géré côté Cloudflare
+- l’architecture est prête pour une exposition HTTPS sans ouvrir de ports locaux
+- la suite consiste à brancher le tunnel sur BunkerWeb
 
-Tu es bon de ce côté-là.
+---
 
-### Prochaine étape : installer Cloudflare Tunnel sur la Prodesk
+**Dernière mise à jour** : août 2026  
+**Statut** : DNS Cloudflare opérationnel – tunnel documenté dans les fiches 16 et 20
 
-On va maintenant installer `cloudflared` sur la Prodesk pour créer le tunnel qui va exposer BunkerWeb.
 
 

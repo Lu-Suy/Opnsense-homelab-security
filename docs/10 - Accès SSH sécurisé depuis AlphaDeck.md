@@ -4,10 +4,10 @@
 
 ## Configuration actuelle
 
-- **Utilisateur** : `doo` (créé via GUI System → Access → Users)
+- **Utilisateur** : `d**` (créé via GUI System → Access → Users)
 **1. Group membership + Shell pour doo**
 
-- **System → Access → Users → édite doo**
+- **System → Access → Users → édite d****
     - **Group Membership** : ajoute-le au groupe **wheel** ou **admins** (c’est ce qui donne les droits sudo).
     - **Login Shell** : mets **/bin/sh** (très important, sinon SSH refuse souvent).
     - **Authorized keys** : la clé doit être collée (vérifie).
@@ -19,7 +19,7 @@
 
 ![Capture d’écran](../images/Pasted%20image%2020260708192552.png)
 
-id_ed25519_godmode.pub : 
+id_ed25519.pub : 
 
 - **Méthode** : Clé SSH + passphrase + password fallback
 - **Clé publique** : ed25519 (clé privée protégée par passphrase)
@@ -37,11 +37,11 @@ id_ed25519_godmode.pub :
 ## Test de connexion depuis AlphaDeck
 
 ```powershell
-ssh doo@10.0.0.1
+ssh d**@10.0.0.*
 ```
 
 - Demande la passphrase de la clé privée
-- Puis demande le mot de passe utilisateur `doo` en fallback
+- Puis demande le mot de passe utilisateur `d**` en fallback
 
 ## Remarques
 
@@ -77,7 +77,7 @@ icacls . /inheritance:r /grant:r $env:USERNAME`:F
 PowerShell
 
 ```
-ssh -i $HOME\.ssh\id_ed25519_godmode root@10.0.0.1
+ssh -i $HOME\.ssh\id_ed25519 root@10.0.0.*
 ```
 
 **Version verbose pour debug** :
@@ -85,7 +85,7 @@ ssh -i $HOME\.ssh\id_ed25519_godmode root@10.0.0.1
 PowerShell
 
 ```
-ssh -v -i $HOME\.ssh\id_ed25519_godmode root@10.0.0.1
+ssh -v -i $HOME\.ssh\id_ed25519 root@10.0.0.*
 ```
 
 **Pour l’utilisateur doo** :
@@ -93,7 +93,7 @@ ssh -v -i $HOME\.ssh\id_ed25519_godmode root@10.0.0.1
 PowerShell
 
 ```
-ssh -v -i $HOME\.ssh\id_ed25519_godmode doo@10.0.0.1
+ssh -v -i $HOME\.ssh\id_ed25519 doo@10.0.0.*
 ```
 
 ## Prochaines étapes (Hardening)

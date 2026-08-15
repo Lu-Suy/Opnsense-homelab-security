@@ -29,27 +29,27 @@
 ## 4. Durcissement appliqué
 
 ### Utilisateurs & sudo
-- `doo` → Utilisateur limité (aucun droit sudo)
-- `hyper_doo` → Admin full sudo (NOPASSWD)
+- `d**` → Utilisateur limité (aucun droit sudo)
+- `hyper_d**` → Admin full sudo (NOPASSWD)
 
 ### SSH (/etc/ssh/sshd_config)
 ```bash
 PermitRootLogin no
 PasswordAuthentication no
 PubkeyAuthentication yes
-AllowUsers doo@10.0.0.10 hyper_doo@10.0.0.10
+AllowUsers d**@10.0.0.* hyper_d**@10.0.0.*
 MaxAuthTries 3
 LoginGraceTime 20
 ClientAliveInterval 300
 ClientAliveCountMax 2
 ```
 
-**Clé utilisée** : `id_ed25519_godmode` (ED25519 avec passphrase)
+**Clé utilisée** : `id_ed25519` (ED25519 avec passphrase)
 
 ### Fail2ban
 - Jail `sshd` active
 - Ban après 4 échecs → 2 jours
-- Ignore : Alphadeck (10.0.0.10) + réseaux locaux
+- Ignore : Alphadeck (10.0.0.**) + réseaux locaux
 
 ## 5. Sauvegardes
 
