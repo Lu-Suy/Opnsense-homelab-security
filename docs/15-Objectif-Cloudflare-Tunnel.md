@@ -1,22 +1,40 @@
+# 15 – Objectif du Cloudflare Tunnel
 
-# 15 - Objectif du Cloudflare Tunnel
-
-**Date** : juillet 2026  
-**Objectif** : exposer de façon sécurisée le site servi par BunkerWeb sur la Prodesk (`10.0.10.10`), sans port-forwarding classique sur la box FAI ni sur OPNsense.
+**Date originale :** juillet 2026  
+**Version portfolio :** 15 août 2026 (sanitisée + enrichie)  
+**Objectif :** Exposer de façon sécurisée le site servi par BunkerWeb, sans ouvrir de ports sur la box FAI ni sur OPNsense.
 
 ---
 
-## Contexte
+## Pourquoi Cloudflare Tunnel ?
 
-L’objectif n’est pas seulement de rendre un site accessible depuis l’extérieur.  
-Il s’agit de le faire avec une surface d’attaque réduite :
+L’objectif n’est pas seulement de rendre un site accessible depuis Internet.  
+Il s’agit de le faire avec une **surface d’attaque drastiquement réduite**.
 
-- aucun port 80/443 ouvert localement
-- IP publique non exposée directement
-- TLS géré côté Cloudflare
-- accès entrant contrôlé via tunnel
+### Problèmes de l’approche classique (port-forwarding)
 
-**Approche retenue** : Cloudflare Tunnel (`cloudflared` sur la Prodesk).
+| Approche classique | Inconvénient |
+|--------------------|--------------|
+| Ouvrir les ports 80/443 sur la box FAI | Exposition directe de l’IP publique |
+| NAT / Port Forward vers OPNsense puis vers BunkerWeb | Double NAT fragile, erreurs de configuration fréquentes |
+| Let’s Encrypt en HTTP-01 direct | Nécessite que les ports soient ouverts et joignables |
+| IP publique visible | Cible facile pour scans et attaques |
+
+L’essai de mai 2026 (documents 11 + 11b) a montré les limites de cette méthode (erreurs de ports, box FAI instable, complexité).
+
+### Avantages de Cloudflare Tunnel
+
+| Avantage | Détail |
+|----------|--------|
+| **Aucun port ouvert localement** | Les ports 80/443 ne sont plus exposés sur la box ni sur OPNsense |
+| **IP publique non exposée** | Le trafic arrive via le réseau Cloudflare, pas directement sur l’IP WAN |
+| **TLS géré par Cloudflare** | Certificats et terminaison TLS côté Cloudflare |
+| **Protection supplémentaire** | WAF, DDoS protection, bot management (même en plan Free) |
+| **Simplicité opérationnelle** | Un seul composant (`cloudflared`) sur le bastion |
+| **Fiabilité** | Solution mature, largement utilisée en production |
+
+**En résumé :**  
+Cloudflare Tunnel permet d’exposer des services web de façon moderne et sécurisée, en sortant du modèle « ouvrir des ports sur Internet ».
 
 ---
 
@@ -47,12 +65,13 @@ C’est la méthode la plus propre pour exploiter correctement Cloudflare Tunnel
 | Philosophie | Web3 / privacy marketing | Infrastructure web mature |
 | WHOIS | Moins classique | Classique, masquable |
 | Maturité | Plus jeune | Très éprouvé en production |
-| Contrôle DNS | Plus limité (pas de SRV, moins de flexibilité)| Excellent |
+| Contrôle DNS | Plus limité (pas de SRV, moins de flexibilité) | Excellent |
 | Sécurité / Tunnel | Pas natif | Excellent (Cloudflare Tunnel + WAF) |
 
-**En résumé** :
+**En résumé :**
 - Unstoppable est plus « privacy-oriented » sur le papier (Web3).
-- Cloudflare est **beaucoup plus puissant et fiable** pour ce qu’on veut faire (Tunnel, protection, DNS avancé). Beaucoup de gens sérieux en cybersécurité l’utilisent justement parce qu’il est robuste.
+- Cloudflare est **beaucoup plus puissant et fiable** pour ce qu’on veut faire (Tunnel, protection, DNS avancé).  
+  Beaucoup de professionnels en cybersécurité l’utilisent justement parce qu’il est robuste.
 
 ---
 
@@ -124,11 +143,11 @@ Dans ce cas, le domaine `horus-ais.com` est passé rapidement en **Active**.
 
 ## 6. Suite logique
 
-Une fois le DNS opérationnel chez Cloudflare, l’étape suivante consiste à installer et configurer `cloudflared` sur la Prodesk, afin de créer le tunnel vers BunkerWeb.
+Une fois le DNS opérationnel chez Cloudflare, l’étape suivante consiste à installer et configurer `cloudflared` sur le bastion, afin de créer le tunnel vers BunkerWeb.
 
 Cette partie est documentée dans :
 
-- [16 – Installer cloudflared et Cloudflare Tunnel (Prodesk)](./16%20-%20Installer%20cloudflared%20et%20Cloudflare%20Tunnel%20(Prodesk).md)
+- [16 – Installer cloudflared et Cloudflare Tunnel](./16%20-%20Installer%20cloudflared%20et%20Cloudflare%20Tunnel%20(Prodesk).md)
 - [20 – Hardening cloudflared – utilisateur dédié non-root](./20%20-%20Hardening%20cloudflared%20-%20utilisateur%20dédié%20non-root.md)
 
 ---
@@ -138,13 +157,13 @@ Cette partie est documentée dans :
 À ce stade :
 
 - le domaine est géré côté Cloudflare
-- l’architecture est prête pour une exposition HTTPS sans ouvrir de ports locaux
+- l’architecture est prête pour une exposition HTTPS **sans ouvrir de ports locaux**
 - la suite consiste à brancher le tunnel sur BunkerWeb
 
 ---
 
-**Dernière mise à jour** : août 2026  
-**Statut** : DNS Cloudflare opérationnel – tunnel documenté dans les fiches 16 et 20
+**Dernière mise à jour originale :** août 2026  
+**Statut :** DNS Cloudflare opérationnel – tunnel documenté dans les fiches 16 et 20
 
-
-
+**Document de référence – Objectif et justification du Cloudflare Tunnel**  
+*Version portfolio sanitisée et enrichie – 15 août 2026*

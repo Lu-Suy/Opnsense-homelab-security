@@ -1,16 +1,27 @@
 # 20 – Hardening cloudflared : utilisateur dédié non-root
 
-**Projet :** Bastion Godmode / OPNsense Homelab Security  
-**Date :** 31 juillet 2026  
-**Machine :** Prodesk (Debian 12) – bastion-godmode  
+**Date originale :** 31 juillet 2026  
+**Machine :** Prodesk (Debian 12) – bastion  
+**Version portfolio :** 15 août 2026 (sanitisée + enrichie)  
 **Objectif :** Faire tourner `cloudflared` sous un utilisateur système non-root et renforcer les permissions des fichiers sensibles.
 
 ---
 
-## Objectif
+## Pourquoi un utilisateur dédié non-root ?
 
-Par défaut, le service `cloudflared` tourne en **root**.  
-On le fait passer sous un utilisateur dédié (`cloudflared`) afin de respecter le principe du moindre privilège.
+Par défaut, le service `cloudflared` tourne en **root**.
+
+C’est fonctionnel, mais contraire au **principe du moindre privilège** :
+- Si une vulnérabilité est exploitée dans `cloudflared`, l’attaquant obtient immédiatement les droits root.
+- Les fichiers de credentials (très sensibles) sont accessibles au processus root sans restriction supplémentaire.
+
+**Objectif du hardening :**
+1. Créer un utilisateur système dédié (`cloudflared`)
+2. Lui interdire toute connexion interactive (`nologin`)
+3. Lui donner uniquement les droits nécessaires sur ses fichiers de configuration
+4. Faire tourner le service sous cet utilisateur
+
+Résultat : même en cas de compromission du processus, l’attaquant n’a plus les droits root.
 
 ---
 
@@ -78,6 +89,7 @@ Toujours vérifier le chemin exact de `nologin` avec `ls /usr/sbin/nologin` avan
 ```bash
 ls -la /etc/cloudflared/
 ```
+
 **Ce qu’on cherche à voir :**
 - Le fichier de configuration (`config.yml`)
 - Le fichier de credentials (celui qui se termine par `.json`)
@@ -85,10 +97,9 @@ ls -la /etc/cloudflared/
 
 ![capture](../images/Pasted%20image%2020260731154412.png)
 
-
 ```text
 -rw------- 1 root root 304 Jul 30 23:51 config.yml
--rw------- 1 root root 175 Jul 30 23:50 fa29*************0d.json
+-rw------- 1 root root 175 Jul 30 23:50 <TUNNEL-ID>.json
 ```
 
 Les fichiers étaient déjà en `600` (seul root pouvait les lire), mais le service tournait encore en root.
@@ -96,7 +107,7 @@ Les fichiers étaient déjà en `600` (seul root pouvait les lire), mais le serv
 ### 2.2 Changement de propriétaire
 ```bash
 sudo chown cloudflared:cloudflared /etc/cloudflared/config.yml
-sudo chown cloudflared:cloudflared /etc/cloudflared/fa29*************be0d.json
+sudo chown cloudflared:cloudflared /etc/cloudflared/<TUNNEL-ID>.json
 ```
 
 **Effet :**  
@@ -109,9 +120,11 @@ ls -la /etc/cloudflared/
 
 ```text
 -rw------- 1 cloudflared cloudflared 304 Jul 30 23:51 config.yml
--rw------- 1 cloudflared cloudflared 175 Jul 30 23:50 fa2***************0d.json
+-rw------- 1 cloudflared cloudflared 175 Jul 30 23:50 <TUNNEL-ID>.json
 ```
+
 ![capture](../images/Pasted%20image%2020260731154633.png)
+
 ---
 
 ## Étape 3 – Faire tourner le service sous l’utilisateur `cloudflared`
@@ -120,7 +133,9 @@ ls -la /etc/cloudflared/
 ```bash
 systemctl cat cloudflared.service
 ```
+
 ![capture](../images/Pasted%20image%2020260731154922.png)
+
 ```ini
 [Unit]
 Description=Cloudflare Tunnel client
@@ -142,8 +157,9 @@ WantedBy=multi-user.target
 ```bash
 sudo systemctl edit cloudflared.service --full
 ```
+
 **Effet de la commande :**
-- Ouvre l’éditeur (nano ou vim selon ta config)
+- Ouvre l’éditeur (nano ou vim selon la config)
 - Tu modifies le fichier de service complet
 
 Ajouter dans la section `[Service]` :
@@ -174,14 +190,18 @@ sudo systemctl daemon-reload
 sudo systemctl restart cloudflared
 sudo systemctl status cloudflared
 ```
+
 ![capture](../images/Pasted%20image%2020260731155432.png)
-Le service est **actif** et le tunnel s’est correctement reconnecté (4 connexions Registered).
+
+Le service est **actif** et le tunnel s’est correctement reconnecté.
 
 ### 3.4 Vérification que le processus tourne bien sous `cloudflared`
 ```bash
 ps -o user,pid,cmd -p $(pgrep -f "cloudflared.*tunnel run")
 ```
+
 ![capture](../images/Pasted%20image%2020260731155829.png)
+
 **Résultat :**
 ```text
 USER     PID CMD
@@ -235,4 +255,5 @@ ps aux | grep cloudflared | grep -v grep
 ---
 
 **Document créé le 31 juillet 2026**  
-**Prêt pour intégration dans le vault Obsidian et le dépôt GitHub.**
+**Document de référence – Hardening cloudflared (utilisateur non-root)**  
+*Version portfolio sanitisée et enrichie – 15 août 2026*

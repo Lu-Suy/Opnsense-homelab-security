@@ -1,6 +1,17 @@
+# 04 – Firewall Rules Hardening & Cleanup
+
+**Projet** : Horus AIS – Architecture de défense  
+**Dernière mise à jour originale** : 21 mai 2026 / 5 juillet 2026  
+**Version portfolio** : 15 août 2026 (sanitization)
+
+> **Note portfolio** :  
+> Les adresses IP internes et hostnames ont été généralisés (`10.0.10.x` = services, `10.0.10.y` = management, `10.0.0.z` = workstation admin, `10.0.20.z` = machine lab).  
+> Le contenu technique et les tableaux de règles sont conservés intégralement (document de travail historique).
+
+---
 
 ### Analyse des logs WAN du 21/05/2026 (21 mai 08:xx)
-- Tout le trafic **rouge** (IGMP depuis 192.168.5.1 vers 224.0.0.1) → bruit légitime du FAI (multicast TV/services).  
+- Tout le trafic **rouge** (IGMP depuis 192.168.x.1 vers 224.0.0.1) → bruit légitime du FAI (multicast TV/services).  
 - Tout le trafic **vert** (Out + "let out anything from firewall host itself") → OPNsense qui fait ses mises à jour DNS/NTP/HTTPS. **Rien de suspect.**  
 - **Conclusion** : Aucun signe d’attaque. Ton firewall est bien configuré et fait son boulot.
 
@@ -8,10 +19,10 @@
 
 | Alias               | Type       | Contenu (une par ligne)                                                                         | Description                             |
 | ------------------- | ---------- | ----------------------------------------------------------------------------------------------- | --------------------------------------- |
-| Alpha_4_Deck        | Host       | 10.0.0.10/24                                                                                    | Admin_Opnsense                          |
-| Prodesk_Manager     | Hosts      | 10.0.10.11                                                                                      | Règles SSH Prodesk                      |
-| Prodesk_web_service | Host       | 10.0.10.10                                                                                      | Règle WEB Services                      |
-| **GX10**            | Hosts      | 10.0.20.10                                                                                      | Règles OPT2 (machine haute performance) |
+| Admin_Workstation        | Host       | 10.0.0.z/24                                                                                    | Admin_Opnsense                          |
+| Bastion_Manager     | Hosts      | 10.0.10.y                                                                                      | Règles SSH Bastion                      |
+| Bastion_Web_Service | Host       | 10.0.10.x                                                                                      | Règle WEB Services                      |
+| **Lab_Machine**            | Hosts      | 10.0.20.z                                                                                      | Règles OPT2 (machine haute performance) |
 | **DNS_External**    | Host(s)    | 1.1.1.1 1.0.0.1 9.9.9.9                                                                         | DNS externes fiables                    |
 | **NTP_Servers**     | Host(s)    | 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org time.cloudflare.com time.google.com | Serveurs NTP                            |
 | **STUN_TURN**       | Host(s)    | stun.x.ai turn.x.ai stun.l.google.com stun1.l.google.com stun2.l.google.com                     | STUN/TURN pour Grok Voice & WebRTC      |
@@ -24,12 +35,12 @@ Default Deny partout + règles explicites + Log activé sur tout + règles spéc
 Aucune règle manuelle nécessaire (comportement par défaut = tout bloquer).
 ### Règles Interface WAN – Accès Admin d’Urgence (5 juillet 2026)
 
-**Objectif** : Accès administration depuis le réseau local FAI (192.168.5.0/24) pour éviter tout lockout.
+**Objectif** : Accès administration depuis le réseau local FAI (réseau FAI) pour éviter tout lockout.
 
 | Ordre | Action | Protocole | Source           | Destination   | Port | Description                                  | Log | Statut |
 | ----- | ------ | --------- | ---------------- | ------------- | ---- | -------------------------------------------- | --- | ------ |
-| 1     | Pass   | TCP       | 192.168.*.*/32 | This Firewall | 443  | Accès HTTPS GUI depuis IP FAI (anti-lockout) | Yes | Active |
-| 2     | Pass   | TCP       | 192.168.*.*/32 | This Firewall | 22   | Accès SSH depuis IP FAI (anti-lockout)       | Yes | Active |
+| 1     | Pass   | TCP       | 192.168.x.x/32 | This Firewall | 443  | Accès HTTPS GUI depuis IP FAI (anti-lockout) | Yes | Active |
+| 2     | Pass   | TCP       | 192.168.x.x/32 | This Firewall | 22   | Accès SSH depuis IP FAI (anti-lockout)       | Yes | Active |
 
 **Note** : Règles placées en haut de l’onglet WAN. IP source mise en dur pour maximiser la restriction.
 **Note** : Les règles automatiques « let out anything from firewall host itself » restent actives (trafic sortant de l’OPNsense lui-même).
@@ -60,30 +71,30 @@ Aucune règle manuelle nécessaire (comportement par défaut = tout bloquer).
 Capture d’écran du **Firewall → Rules → LAN**.
 Tout est bien appliqué :
 
-- Les règles BunkerWeb (80 + 443) sont maintenant **correctement pointées sur Prodesk_Web_Service** (et non plus sur Manager).
-- SSH est **ultra-restreint** à AlphaDeck uniquement.
+- Les règles BunkerWeb (80 + 443) sont maintenant **correctement pointées sur Bastion_Web_Service** (et non plus sur Manager).
+- SSH est **ultra-restreint** à Admin_Workstation uniquement.
 - J'ai ajouté la règle **Block All** tout en bas (c’est la plus importante pour le durcissement).
 - J'ai activé les **logs sur toutes les règles** → parfait pour la traçabilité et Wazuh plus tard.
-- L’alias **AlphaDeck** = 10.0.0.10 (même chose que Admin-Workstations) → nickel.
+- L’alias **Admin_Workstation** = 10.0.0.z (même chose que Admin-Workstations) → nickel.
 
 | Ordre | Action | Protocole | Source             | Destination         | Port         | Description                                       | Log | Statut |
 | ----- | ------ | --------- | ------------------ | ------------------- | ------------ | ------------------------------------------------- | --- | ------ |
-| 1     | Pass   | TCP       | Admin-Workstations | Prodesk_Web_Service | 80, 443      | Accès BunkerWeb (HTTP + HTTPS) depuis LAN         | Yes | Active |
-| 2     | Pass   | TCP       | Admin-Workstations | Prodesk_Manager     | 22           | SSH uniquement depuis Alphadeck vers Manager      | Yes | Active |
+| 1     | Pass   | TCP       | Admin-Workstations | Bastion_Web_Service | 80, 443      | Accès BunkerWeb (HTTP + HTTPS) depuis LAN         | Yes | Active |
+| 2     | Pass   | TCP       | Admin-Workstations | Bastion_Manager     | 22           | SSH uniquement depuis Admin_Workstation vers Manager      | Yes | Active |
 | 3     | Pass   | TCP/UDP   | LAN net            | DNS_External        | 53, 853, 443 | DNS Outbound (Do53 + DoT + DoH)                   | Yes | Active |
 | 4     | Pass   | UDP       | LAN net            | NTP_Servers         | 123          | NTP Outbound                                      | Yes | Active |
 | 5     | Pass   | TCP       | LAN net            | *                   | 80, 443      | HTTP/HTTPS Outbound (navigation + mises à jour)   | Yes | Active |
 | 6     | Pass   | ICMP      | LAN net            | *                   | *            | ICMP ping (optionnel mais utile)                  | Yes | Active |
 | 7     | Pass   | UDP       | LAN net            | STUN_TURN           | 3478, 5349   | STUN/TURN pour Grok Voice                         | Yes | Active |
 | 8     | Pass   | UDP       | LAN net            | *                   | 50000-65535  | WebRTC Media Ports (Grok Voice & RTC)             | Yes | Active |
-| 9     | Pass   | TCP       | Admin-Workstations | This Firewall       | 22           | SSH AlphaDeck → OPNsense                          | Yes | Active |
+| 9     | Pass   | TCP       | Admin-Workstations | This Firewall       | 22           | SSH Admin_Workstation → OPNsense                          | Yes | Active |
 | 10    | Block  | *         | LAN net            | *                   | *            | **Block All LAN** (dernière règle – durcissement) | Yes | Active |
 
 
 
 ![Capture d’écran](../images/Pasted%20image%2020260705174648.png)
 
-« Mise à jour LAN du 21/05/2026 – Block All ajouté + logs activés partout. AlphaDeck alias confirmé (10.0.0.10). »
+« Mise à jour LAN du 21/05/2026 – Block All ajouté + logs activés partout. Admin_Workstation alias confirmé (10.0.0.z). »
 
 ### 3. Règles Interface OPT1 (10.0.10.0/24) – Bastion Godmode Mise à jour du 21/05/2026 – Configuration actuelle après durcissement.
 ### Analyse rapide de tes règles OPT1 actuelles (21/05/2026)
@@ -93,7 +104,7 @@ Tout est bien appliqué :
 - DNS bien séparé (Do53 + DoT + DoH) → très propre.
 - NTP dédié.
 - HTTP/HTTPS outbound bien présents (séparés, c’est OK).
-- **SSH ultra-restreint** : seul AlphaDeck peut joindre le Manager + 2 règles de blocage explicites → parfait.
+- **SSH ultra-restreint** : seul Admin_Workstation peut joindre le Manager + 2 règles de blocage explicites → parfait.
 - ICMP autorisé.
 - **Block All** en dernière règle (activé et loggé) → exactement ce qu’on veut.
 
@@ -105,9 +116,9 @@ Tout est bien appliqué :
 | 4     | Pass   | UDP       | OPT1 net  | NTP_Servers         | 123  | NTP Outbound                                                | Yes | Active |
 | 5     | Pass   | TCP       | OPT1 net  | *                   | 443  | HTTPS Outbound (updates, web, Docker, BunkerWeb, etc.)      | Yes | Active |
 | 6     | Pass   | TCP       | OPT1 net  | *                   | 80   | HTTP Outbound (updates, web, Docker, etc.)                  | Yes | Active |
-| 7     | Pass   | TCP       | AlphaDeck | Prodesk_Manager     | 22   | SSH uniquement depuis Alphadeck vers Manager (OPT1)         | Yes | Active |
-| 8     | Block  | TCP       | *         | Prodesk_Web_Service | 22   | Block SSH vers IP Web Service (10.0.10.10)                  | Yes | Active |
-| 9     | Block  | TCP       | *         | Prodesk_Manager     | 22   | Block SSH vers Manager depuis n’importe où ailleurs         | Yes | Active |
+| 7     | Pass   | TCP       | Admin_Workstation | Bastion_Manager     | 22   | SSH uniquement depuis Admin_Workstation vers Manager (OPT1)         | Yes | Active |
+| 8     | Block  | TCP       | *         | Bastion_Web_Service | 22   | Block SSH vers IP Web Service (10.0.10.x)                  | Yes | Active |
+| 9     | Block  | TCP       | *         | Bastion_Manager     | 22   | Block SSH vers Manager depuis n’importe où ailleurs         | Yes | Active |
 | 10    | Pass   | ICMP      | OPT1 net  | *                   | *    | ICMP ping (optionnel mais utile)                            | Yes | Active |
 | 11    | Block  | *         | OPT1 net  | 10.0.0.0/8          | *    | **Block trafic vers réseaux privés** (évite pivot vers LAN) | Yes | Active |
 | 12    | Block  | *         | OPT1 net  | 172.16.0.0/12       | *    | **Block trafic vers réseaux privés** (évite pivot)          | Yes | Active |
@@ -132,37 +143,37 @@ Ajoute ces deux règles **juste avant** le Block All :
 | 13    | Block  | *         | OPT1 net | *             | *    | **Block All OPT1**                              |
 Ça empêche BunkerWeb (si compromis) d’attaquer le LAN ou OPT2.
 
-**Pour OPT2 (GX10)** : Tes règles actuelles sont suffisantes. Tu peux juste ajouter la même règle de blocage vers réseaux privés si tu veux être cohérent.
+**Pour OPT2 (Lab_Machine)** : Tes règles actuelles sont suffisantes. Tu peux juste ajouter la même règle de blocage vers réseaux privés si tu veux être cohérent.
 
 
-### 4. Règles Interface **OPT2** (10.0.20.0/24) – GX10 / Lab isolé (nouvelle)
+### 4. Règles Interface **OPT2** (10.0.20.0/24) – Lab_Machine / Lab isolé (nouvelle)
 (Règles à créer sur l’onglet **OPT2** – très restrictives)
 
 **Effet précis de ces règles :**
 
-- La GX10 peut sortir sur Internet pour ses mises à jour et son fonctionnement normal (DNS chiffré + NTP + HTTP/HTTPS).
-- **Aucune autre machine** (sauf AlphaDeck) ne peut atteindre la GX10.
-- Si la GX10 est un jour compromise, elle **ne pourra pas** atteindre le LAN, OPT1 ou le reste du réseau grâce au Block All en dernier.
+- La Lab_Machine peut sortir sur Internet pour ses mises à jour et son fonctionnement normal (DNS chiffré + NTP + HTTP/HTTPS).
+- **Aucune autre machine** (sauf Admin_Workstation) ne peut atteindre la Lab_Machine.
+- Si la Lab_Machine est un jour compromise, elle **ne pourra pas** atteindre le LAN, OPT1 ou le reste du réseau grâce au Block All en dernier.
 - Tout est logué → parfait pour la suite Wazuh.
 
 | Ordre | Action | Protocole | Source       | Destination   | Port | Description                                                 | Log | Statut |
 | ----- | ------ | --------- | ------------ | ------------- | ---- | ----------------------------------------------------------- | --- | ------ |
-| 1     | Pass   | TCP/UDP   | GX10         | DNS_External  | 53   | DNS Outbound (Do53 classique)                               | Yes | Active |
-| 2     | Pass   | TCP       | GX10         | DNS_External  | 853  | DNS Over TLS (DoT) Outbound                                 | Yes | Active |
-| 3     | Pass   | TCP       | GX10         | *             | 443  | HTTPS Outbound (updates, Docker, web, DoH, etc.)            | Yes | Active |
-| 4     | Pass   | TCP       | GX10         | *             | 80   | HTTP Outbound (updates, Docker, etc.)                       | Yes | Active |
-| 5     | Pass   | UDP       | GX10         | NTP_Servers   | 123  | NTP Outbound                                                | Yes | Active |
-| 6     | Pass   | ICMP      | GX10         | *             | *    | ICMP ping (optionnel mais utile)                            | Yes | Active |
-| 7     | Pass   | TCP       | Alpha_4_Deck | GX10          | 22   | SSH depuis Alphadeck vers GX10 (admin lab – optionnel)      | Yes | Active |
-| 8     | Block  | *         | GX10         | 10.0.0.0/8    | *    | **Block trafic vers réseaux privés** (évite pivot LAN/OPT1) | Yes | Active |
-| 9     | Block  | *         | GX10         | 172.16.0.0/12 | *    | **Block trafic vers réseaux privés** (évite pivot)          | Yes | Active |
-| 10    | Block  | *         | GX10         | *             | *    | **Block All OPT2** (dernière règle – isolation forte)       | Yes | Active |
+| 1     | Pass   | TCP/UDP   | Lab_Machine         | DNS_External  | 53   | DNS Outbound (Do53 classique)                               | Yes | Active |
+| 2     | Pass   | TCP       | Lab_Machine         | DNS_External  | 853  | DNS Over TLS (DoT) Outbound                                 | Yes | Active |
+| 3     | Pass   | TCP       | Lab_Machine         | *             | 443  | HTTPS Outbound (updates, Docker, web, DoH, etc.)            | Yes | Active |
+| 4     | Pass   | TCP       | Lab_Machine         | *             | 80   | HTTP Outbound (updates, Docker, etc.)                       | Yes | Active |
+| 5     | Pass   | UDP       | Lab_Machine         | NTP_Servers   | 123  | NTP Outbound                                                | Yes | Active |
+| 6     | Pass   | ICMP      | Lab_Machine         | *             | *    | ICMP ping (optionnel mais utile)                            | Yes | Active |
+| 7     | Pass   | TCP       | Admin_Workstation | Lab_Machine          | 22   | SSH depuis Admin_Workstation vers Lab_Machine (admin lab – optionnel)      | Yes | Active |
+| 8     | Block  | *         | Lab_Machine         | 10.0.0.0/8    | *    | **Block trafic vers réseaux privés** (évite pivot LAN/OPT1) | Yes | Active |
+| 9     | Block  | *         | Lab_Machine         | 172.16.0.0/12 | *    | **Block trafic vers réseaux privés** (évite pivot)          | Yes | Active |
+| 10    | Block  | *         | Lab_Machine         | *             | *    | **Block All OPT2** (dernière règle – isolation forte)       | Yes | Active |
 
 ---
 ![Capture d’écran](../images/Pasted%20image%2020260705183237.png)
 
 ---
-Effet global : La GX10 est maintenant fortement isolée tout en restant pleinement fonctionnelle. Si elle est compromise un jour, elle ne pourra pas aller vers le LAN ou OPT1 grâce au Block All.
+Effet global : La Lab_Machine est maintenant fortement isolée tout en restant pleinement fonctionnelle. Si elle est compromise un jour, elle ne pourra pas aller vers le LAN ou OPT1 grâce au Block All.
 
 C’est **clair**, **reproductible** et **durci** .
 
@@ -174,18 +185,18 @@ Voici les points qu’on peut améliorer pour rendre l’isolation **encore plus
 
 |Amélioration|Pourquoi c’est utile|Recommandation|
 |---|---|---|
-|**Bloquer explicitement le trafic entrant** depuis LAN et OPT1 vers GX10 (sauf SSH AlphaDeck)|Empêche tout pivot depuis une autre zone|À ajouter|
-|**Limiter les ports sortants** (ex: ne pas autoriser tout le 80/443, mais seulement certains domaines de mise à jour)|Réduit la surface d’attaque si la GX10 est compromise|Optionnel (un peu plus contraignant)|
-|**Bloquer le trafic vers les réseaux privés** (10.0.0.0/8, 172.16.0.0/12, etc.) depuis GX10|Empêche la GX10 de parler aux autres machines du réseau local|Très recommandé|
+|**Bloquer explicitement le trafic entrant** depuis LAN et OPT1 vers Lab_Machine (sauf SSH Admin_Workstation)|Empêche tout pivot depuis une autre zone|À ajouter|
+|**Limiter les ports sortants** (ex: ne pas autoriser tout le 80/443, mais seulement certains domaines de mise à jour)|Réduit la surface d’attaque si la Lab_Machine est compromise|Optionnel (un peu plus contraignant)|
+|**Bloquer le trafic vers les réseaux privés** (10.0.0.0/8, 172.16.0.0/12, etc.) depuis Lab_Machine|Empêche la Lab_Machine de parler aux autres machines du réseau local|Très recommandé|
 |**Rate limiting** sur les connexions sortantes|Limite les attaques DDoS ou scans sortants si compromise|Optionnel|
-|**Anti-spoofing** sur l’interface OPT2|Évite que la GX10 usurpe des IPs|Déjà souvent géré globalement par OPNsense|
+|**Anti-spoofing** sur l’interface OPT2|Évite que la Lab_Machine usurpe des IPs|Déjà souvent géré globalement par OPNsense|
 
-## 4. Cleanup-plan – Nettoyage de la Prodesk (21/05/2026)
+## 4. Cleanup-plan – Nettoyage de la Bastion (21/05/2026)
 
 **Objectif**:  
 Faire un vrai ménage avant BunkerWeb multisite + Wazuh. Libérer l’espace, nettoyer les logs, préparer les dossiers pour le SIEM.
 
-**État matériel** : Prodesk 600 Mini G2 – Ryzen 7, 16 Go RAM, SSD 1 To → largement suffisant.
+**État matériel** : Bastion 600 Mini G2 – processeur performant, 16 Go RAM, SSD 1 To → largement suffisant.
 
 ### État avant nettoyage (21/05/2026 – 10:xx)
 
@@ -205,7 +216,7 @@ Filesystem     Size  Used Avail Use% Mounted on
 
 **Nombre de paquets installés** : 336 (très propre pour une Debian 12).
 
-### Commandes de nettoyage (exécutées en hyper_doo)
+### Commandes de nettoyage (exécutées en admin-user)
 
 **1. Mise à jour + nettoyage paquets**
 
@@ -267,4 +278,4 @@ apt list --installed | wc -l
 - BunkerWeb multisite + Let’s Encrypt (fichier 11)
 - WireGuard (fichier 12)
 
-**Dernière mise à jour** : 21 mai 2026 – Cleanup terminé, Prodesk prête pour les gros services.
+**Dernière mise à jour** : 21 mai 2026 – Cleanup terminé, Bastion prête pour les gros services.

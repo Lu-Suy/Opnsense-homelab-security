@@ -1,8 +1,15 @@
+# 08 – Installation BunkerWeb (Version Finale Fonctionnelle)
 
-
-**Date** : 17 mai 2026  
+**Date originale** : 17 mai 2026  
 **Statut** : ✅ **Fonctionnel** – Page statique personnalisée affichée  
-**Objectif atteint** : BunkerWeb sert correctement la page `index.html` avec les cœurs sur `http://10.0.10.10`
+**Version portfolio** : 15 août 2026 (sanitization)  
+**Objectif atteint** : BunkerWeb sert correctement la page `index.html` sur l’IP services du bastion
+
+> **Note portfolio** :  
+> Snapshot de la configuration qui a fonctionné en mai 2026 (ancien bastion).  
+> Les IPs et noms ont été généralisés. Contenu technique et explications conservés intégralement.
+
+---
 
 ### Configuration finale qui marche (la bonne)
 
@@ -11,8 +18,8 @@
 ```env
 # ==================== Variables BunkerWeb ====================
 MULTISITE=yes
-SERVER_NAME=10.0.10.10 bastion-godmode
-DEFAULT_SERVER=10.0.10.10
+SERVER_NAME=10.0.10.x bastion
+DEFAULT_SERVER=10.0.10.x
 DISABLE_DEFAULT_SERVER=no
 
 # === Réseau & DNS ===
@@ -121,10 +128,9 @@ docker compose ps
 docker exec bunkerweb ls -la /data/www/
 ```
 
-**Capture d’écran actuelle** : Page avec les cœurs 💖 affichée correctement sur `http://10.0.10.10/index.html`.
----
-![Capture d’écran](../images/Pasted%20image%2020260517050810.png)
+**Capture d’écran actuelle** : Page avec les cœurs affichée correctement sur `http://10.0.10.x/index.html`.
 
+![Capture d’écran](../images/Pasted%20image%2020260517050810.png)
 
 ### Explication détaillée des variables importantes
 
@@ -144,5 +150,7 @@ docker logs bunkerweb --tail 30
 docker logs bw-scheduler --tail 20
 ```
 
-
 ---
+
+**Document historique – Configuration BunkerWeb fonctionnelle (mai 2026)**  
+*Version portfolio sanitisée – 15 août 2026*

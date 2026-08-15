@@ -1,7 +1,9 @@
-**Projet :** Bastion Godmode / OPNsense Homelab Security  
-**Date :** 31 juillet 2026  
-**Lié au document :** 19 – Migration des règles Firewall OPNsense  
+# 19 – Optimisation STUN/TURN et création de l’alias STUN_TURN_PORTS
+
+**Date originale :** 31 juillet 2026  
+**Lié au document :** 18 – Migration des règles Firewall OPNsense  
 **Machine :** HP EliteDesk 800 G2 SFF (OPNsense 26.7.1_1)  
+**Version portfolio :** 15 août 2026 (sanitisée)
 
 ---
 
@@ -56,17 +58,17 @@ Ports inclus :
 
 ---
 
-## 5. Nouvelle règle firewall (igc2_LAN)
+## 5. Nouvelle règle firewall (LAN)
 
 | Paramètre              | Valeur                          |
 |------------------------|---------------------------------|
 | Action                 | Pass                            |
-| Interface              | igc2_LAN                        |
+| Interface              | LAN                             |
 | Protocol               | TCP/UDP                         |
-| Source                 | igc2_LAN network                |
+| Source                 | LAN network                     |
 | Destination            | STUN_TURN                       |
 | Destination Port       | STUN_TURN_PORTS                 |
-| Description            | STUN/TURN optimisé (Grok Voice + WebRTC) |
+| Description            | STUN/TURN optimisé (WebRTC)     |
 
 Cette règle remplace les deux anciennes règles séparées (3478 et 5349).
 
@@ -76,7 +78,7 @@ La règle WebRTC Media Ports (UDP 50000-65535) a été conservée telle quelle.
 
 ## 6. Raisons techniques
 
-- Réduction du bruit dans les logs DNS (plus de NXDOMAIN sur x.ai et Mozilla)
+- Réduction du bruit dans les logs DNS (plus de NXDOMAIN sur les serveurs morts)
 - Meilleure performance et fiabilité grâce aux serveurs Google + Cloudflare
 - OpenRelay (Metered) conservé comme option TURN gratuite (avec limites)
 - Une seule règle au lieu de plusieurs → plus simple à maintenir
@@ -90,8 +92,9 @@ La règle WebRTC Media Ports (UDP 50000-65535) a été conservée telle quelle.
 - Alias `STUN_TURN_PORTS` créé
 - Une seule règle STUN/TURN propre et optimisée
 - Règle WebRTC Media Ports toujours active
-- Plus d’erreurs DNS liées aux anciens serveurs x.ai / Mozilla dans les logs
+- Plus d’erreurs DNS liées aux anciens serveurs dans les logs
 
+---
 
-
-
+**Document de référence – Optimisation STUN/TURN**  
+*Version portfolio sanitisée – 15 août 2026*
