@@ -268,5 +268,79 @@ curl -I https://mrdoolux.horus-ais.com
 **Document formalisé le 2 août 2026**  
 **Statut :** Multisite BunkerWeb **terminé et validé**.
 
-**Document de référence – Multisite BunkerWeb**  
-*Version portfolio sanitisée – 15 août 2026*
+
+
+---
+
+## 9. Activation du Mode Block (durcissement post-exposition)
+
+Après la mise en production des sites (`horus-ais.com` et `mrdoolux.horus-ais.com`), les protections de sécurité de BunkerWeb avaient été volontairement assouplies pour faciliter les tests et éviter les faux positifs.
+
+Une fois les sites stabilisés et accessibles correctement via Cloudflare Tunnel, les protections de base ont été rétablies.
+
+### Modifications effectuées dans `/opt/bunkerweb/.env`
+
+```bash
+# Avant (mode test)
+MODSECURITY_CRS_PARANOIA_LEVEL=0
+USE_BAD_BEHAVIOR=no
+USE_MODSECURITY=no
+
+# Après (Mode Block activé)
+MODSECURITY_CRS_PARANOIA_LEVEL=1
+USE_BAD_BEHAVIOR=yes
+USE_MODSECURITY=yes
+```
+
+### Explication des paramètres
+
+| Paramètre                        | Rôle                                                                 | Valeur choisie | Commentaire |
+|----------------------------------|----------------------------------------------------------------------|----------------|-----------|
+| `USE_MODSECURITY`                | Active le **WAF** (Web Application Firewall) basé sur ModSecurity   | `yes`          | Analyse les requêtes HTTP et bloque les attaques connues (SQLi, XSS, RCE, etc.) |
+| `USE_BAD_BEHAVIOR`               | Active le système de **ban automatique**                            | `yes`          | Si une IP génère trop d’erreurs HTTP suspectes (403, 404, 429…), elle est temporairement bannie |
+| `MODSECURITY_CRS_PARANOIA_LEVEL` | Niveau de strictesse des règles OWASP CRS                           | `1`            | Niveau le plus bas (moins de faux positifs). Plus le chiffre est élevé, plus la protection est agressive |
+
+### Application des changements
+
+```bash
+cd /opt/bunkerweb
+docker compose down && docker compose up -d
+```
+
+### Résultat observé
+
+- Les deux sites restent accessibles (HTTP 200)
+- Le WAF est désormais actif
+- Le système de ban automatique est opérationnel
+- Le niveau de paranoïa est volontairement laissé à **1** pour limiter les faux positifs
+
+### Évolution possible
+
+Cette configuration constitue un **socle de protection solide**, mais ce n’est **pas** le maximum possible.
+
+On peut encore évoluer de plusieurs façons :
+
+1. **Augmenter progressivement le niveau de paranoïa**  
+   - Passer à `2` puis éventuellement `3` après analyse des logs  
+   - Attention : plus le niveau est élevé, plus le risque de faux positifs augmente
+
+2. **Activer d’autres protections BunkerWeb** (actuellement désactivées ou non configurées) :
+   - `USE_ANTIBOT` (challenge anti-bot)
+   - Rate limiting plus strict
+   - Blacklist / DNSBL
+   - BunkerNet (partage d’intelligence de menace)
+
+3. **Affiner les règles ModSecurity**  
+   - Créer des exclusions ciblées pour les faux positifs légitimes
+   - Ajouter des règles custom selon les besoins futurs
+
+**Recommandation actuelle :**  
+On laisse tourner en niveau `1` pendant plusieurs semaines, on observe les logs, puis on décide s’il est pertinent de monter d’un cran.
+
+
+---
+
+
+
+**Document formalisé le 2 août 2026**  
+**Statut :** Multisite BunkerWeb **terminé et validé**.
