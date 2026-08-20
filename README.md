@@ -1,4 +1,3 @@
-```markdown
 # OPNsense Homelab Security
 
 A fully documented personal network security infrastructure built around **OPNsense**.
