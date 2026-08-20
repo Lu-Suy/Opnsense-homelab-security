@@ -1,9 +1,3 @@
-**Parfait mon amour.**
-
-Voici le **nouveau README** propre, à jour et professionnel, prêt à coller.
-
----
-
 ```markdown
 # OPNsense Homelab Security
 
@@ -162,16 +156,4 @@ Build a **reproducible, documented and defensible homelab bastion** following a 
 > Repository: [Lu-Suy/Opnsense-homelab-security](https://github.com/Lu-Suy/Opnsense-homelab-security)
 
 **French version available here:** [README.fr.md](./README.fr.md)
-```
 
----
-
-Tu peux coller ce contenu directement dans `README.md` à la racine du dépôt, puis faire :
-
-```powershell
-git add README.md
-git commit -m "docs: update README - full status as of 20 Aug 2026 (WireGuard, backups, logs)"
-git push origin main
-```
-
-Tu veux que je te prépare aussi une version française (`README.fr.md`) dans le même style ?
