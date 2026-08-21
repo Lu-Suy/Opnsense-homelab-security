@@ -86,13 +86,10 @@ Folder [`docs/`](./docs/) — screenshots in [`images/`](./images/).
 - [20 – cloudflared non-root hardening](./docs/20-Hardening-cloudflared.md)
 - [21 – BunkerWeb multisite](./docs/21-Multisite-BunkerWeb.md)
 - [22 – Web3 redirection](./docs/22-Redirection-mrdoolux-brave.md)
-<<<<<<< Updated upstream
 - [40 – Sites 403 / Real IP Cloudflare](./docs/40%20-%20Sites-en-403-Analyse-et-resolution-Real-IP-Cloudflare-SANITIZED-2026-08-19%20(1).md)
 - [41 – Page vitrine Horus AIS + sous-domaine isa](./docs/41%20-%20Page-vitrine-Horus-AIS-sous-domaine-isa.md)
-=======
 - [40 – Sites in 403 / Real-IP Cloudflare](./docs/40%20-%20Sites-en-403-Analyse-et-resolution-Real-IP-Cloudflare-SANITIZED-2026-08-19.md)
 - [41 – Landing page Horus AIS + subdomain isa](./docs/41%20-%20Page-vitrine-Horus-AIS-sous-domaine-isa.md)
->>>>>>> Stashed changes
 
 ### Email, hardware, ops
 - [12 – Domain & email](./docs/12-Domaine-Messagerie-externe.md)
@@ -151,15 +148,12 @@ Build a **reproducible, documented and defensible homelab bastion** following a 
 - [x] WireGuard VPN (Road Warrior)  
 - [x] Encrypted backups + rotation (Daily 7 / Weekly 4)  
 - [x] BunkerWeb / Docker logs ingestion into Wazuh  
-<<<<<<< Updated upstream
 - [x] WireGuard VPN (Road Warrior) operational  
 - [x] Encrypted backups + daily/weekly rotation
-- [x] **41** – Page vitrine Horus AIS (`horus-ais.com`) + ancien index sur `isa.horus-ais.com`  
+- [x] Page vitrine Horus AIS (`horus-ais.com`) + ancien index sur `isa.horus-ais.com`  
 - [ ] Real website content  
 - [ ] Email alerting (Fail2ban / Wazuh / OPNsense)  
-=======
 - [x] Real website content (landing page on `horus-ais.com`)  
->>>>>>> Stashed changes
 
 ---
 
