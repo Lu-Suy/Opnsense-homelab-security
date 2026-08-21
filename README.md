@@ -87,6 +87,7 @@ Folder [`docs/`](./docs/) — screenshots in [`images/`](./images/).
 - [21 – BunkerWeb multisite](./docs/21-Multisite-BunkerWeb.md)
 - [22 – Web3 redirection](./docs/22-Redirection-mrdoolux-brave.md)
 - [40 – Sites 403 / Real IP Cloudflare](./docs/40%20-%20Sites-en-403-Analyse-et-resolution-Real-IP-Cloudflare-SANITIZED-2026-08-19%20(1).md)
+- [41 – Page vitrine Horus AIS + sous-domaine isa](./docs/41%20-%20Page-vitrine-Horus-AIS-sous-domaine-isa.md)
 
 ### Email, hardware, ops
 - [12 – Domain & email](./docs/12-Domaine-Messagerie-externe.md)
@@ -145,7 +146,8 @@ Build a **reproducible, documented and defensible homelab bastion** following a 
 - [x] Wazuh Agent on admin workstation  
 - [x] BunkerWeb / Docker logs ingestion into Wazuh  
 - [x] WireGuard VPN (Road Warrior) operational  
-- [x] Encrypted backups + daily/weekly rotation  
+- [x] Encrypted backups + daily/weekly rotation
+- [x] **41** – Page vitrine Horus AIS (`horus-ais.com`) + ancien index sur `isa.horus-ais.com`  
 - [ ] Real website content  
 - [ ] Email alerting (Fail2ban / Wazuh / OPNsense)  
 
