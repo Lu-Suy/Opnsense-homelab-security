@@ -2,7 +2,7 @@
 
 A fully documented personal network security infrastructure built around **OPNsense**.
 
-Hardened homelab featuring firewall, network segmentation, IDS, WAF, web exposure **without port-forwarding** (Cloudflare Tunnel), SIEM, disk encryption, automated encrypted backups, and professional email.  
+Hardened homelab featuring firewall, network segmentation, IDS, WAF, web exposure **without port-forwarding** (Cloudflare Tunnel), SIEM, disk encryption, automated encrypted backups, VPN, and professional email.  
 Documentation focused on reproducibility, portfolio quality, and technical traceability.
 
 ---
@@ -21,7 +21,7 @@ Documentation focused on reproducibility, portfolio quality, and technical trace
 - Wazuh SIEM (Dashboard on port 8443)  
 - LUKS disk encryption + remote unlock (dracut-sshd)  
 - Hardened SSH + Fail2ban  
-- Automated encrypted backups with rotation  
+- Automated encrypted backups (Daily 7 / Weekly 4)
 
 **Previous bastion (Prodesk – Debian 12)**  
 - Kept as reference / potential honeypot  
@@ -45,15 +45,15 @@ Documentation focused on reproducibility, portfolio quality, and technical trace
 | **Wazuh** | All-in-one SIEM (Indexer + Manager + Dashboard) | ✅ |
 | **Syslog OPNsense → Wazuh** | filterlog / Suricata collection | ✅ |
 | **Wazuh Agent** | AlphaDeck (Windows 10) | ✅ |
-| **BunkerWeb / Docker logs → Wazuh** | Collection + Bad Behavior decoding | ✅ |
 | **WireGuard** | Remote VPN access (Road Warrior) | ✅ |
-| **Encrypted backups** | Daily + Weekly rotation on LUKS volume | ✅ |
+| **Encrypted backups** | LUKS volume + automated rotation | ✅ |
 
 ### Exposed sites (via tunnel)
 
 | Hostname | Backend | Content |
 |----------|---------|---------|
-| `horus-ais.com` / `www` | BunkerWeb | Main site |
+| `horus-ais.com` / `www` | BunkerWeb | **Main landing page (vitrine)** |
+| `isa.horus-ais.com` | BunkerWeb | Previous index (preserved) |
 | `mrdoolux.horus-ais.com` | BunkerWeb | Tests / branding |
 | `mrdoolux.brave` | Web3 redirection | Configured |
 
@@ -86,8 +86,13 @@ Folder [`docs/`](./docs/) — screenshots in [`images/`](./images/).
 - [20 – cloudflared non-root hardening](./docs/20-Hardening-cloudflared.md)
 - [21 – BunkerWeb multisite](./docs/21-Multisite-BunkerWeb.md)
 - [22 – Web3 redirection](./docs/22-Redirection-mrdoolux-brave.md)
+<<<<<<< Updated upstream
 - [40 – Sites 403 / Real IP Cloudflare](./docs/40%20-%20Sites-en-403-Analyse-et-resolution-Real-IP-Cloudflare-SANITIZED-2026-08-19%20(1).md)
 - [41 – Page vitrine Horus AIS + sous-domaine isa](./docs/41%20-%20Page-vitrine-Horus-AIS-sous-domaine-isa.md)
+=======
+- [40 – Sites in 403 / Real-IP Cloudflare](./docs/40%20-%20Sites-en-403-Analyse-et-resolution-Real-IP-Cloudflare-SANITIZED-2026-08-19.md)
+- [41 – Landing page Horus AIS + subdomain isa](./docs/41%20-%20Page-vitrine-Horus-AIS-sous-domaine-isa.md)
+>>>>>>> Stashed changes
 
 ### Email, hardware, ops
 - [12 – Domain & email](./docs/12-Domaine-Messagerie-externe.md)
@@ -110,18 +115,17 @@ Folder [`docs/`](./docs/) — screenshots in [`images/`](./images/).
 - [31A – Discover filters & smart alerts](./docs/31A%20-%20Filtres%20Discover%20%26%20Alertes%20intelligentes%20OPNsense%20(G4).md)
 - [32 – Wazuh Agent on AlphaDeck](./docs/32%20-%20Agent%20Wazuh%20sur%20AlphaDeck%20(Windows%2010).md)
 
-### Backups, VPN & Advanced monitoring
-- [33 – Boot recovery / persistent journal](./docs/33-Incident-Boot-Recovery-Journal-Persistant-BIOS%20(1).md)
-- [34 – First full backup (external)](./docs/34%20–%20Premier%20backup%20complet%20de%20la%20G4%20(Rocky%20Linux)%20vers%20disque%20externe.md)
-- [35 – Internal LUKS backup volume](./docs/35%20-%20Volume%20de%20backup%20interne%20chiffré%20(LUKS)%20sur%20le%20SSD%20Verbatim%201%20To.md)
-- [36 – Backup automation](./docs/36%20–%20Automatisation%20des%20backups%20G4%20+%20OPNsense.md)
+### Operations, backups & VPN
+- [33 – Boot recovery / persistent journal / BIOS](./docs/33-Incident-Boot-Recovery-Journal-Persistant-BIOS.md)
+- [35 – Internal encrypted backup volume (LUKS)](./docs/35%20-%20Volume%20de%20backup%20interne%20chiffré%20(LUKS)%20sur%20le%20SSD%20Verbatim%201%20To.md)
+- [36 – Backup automation G4 + OPNsense](./docs/36-Automatisation-des-backups-G4-OPNsense.md)
 - [36A – Backup check-up](./docs/36A-Check-up-backups-G4-OPNsense.md)
-- [36B – Backup rotation & retention](./docs/36B%20-%20Rotation%20et%20rétention%20des%20backups%20G4%20(Daily_Weekly).md)
-- [37 – G4 maintenance (multi-LUKS fix)](./docs/37-Maintenance-G4-17-aout-2026-Upgrade-Correctif-multi-LUKS-BunkerWeb.md)
-- [38 – WireGuard VPN](./docs/38%20-%20WireGuard-VPN-OPNsense-2026-08-18.md)
+- [36B – Rotation & retention (Daily 7 / Weekly 4)](./docs/36B-Rotation-et-retention-backups-G4.md)
+- [37 – G4 maintenance (kernel, multi-LUKS, BunkerWeb)](./docs/37-Maintenance-G4-17-aout-2026-Upgrade-Correctif-multi-LUKS-BunkerWeb.md)
+- [38 – WireGuard VPN on OPNsense](./docs/38%20-%20WireGuard-VPN-OPNsense-2026-08-18.md)
 - [39 – BunkerWeb / Docker logs → Wazuh](./docs/39%20-%20Collecte-logs-BunkerWeb-Docker-Wazuh-SANITIZED-2026-08-19.md)
-- [39A – Bad Behavior decoders](./docs/39A%20-%20BunkerWeb-BadBehavior-Wazuh-Decoders-Rules-2026-08-20.md)
-- [39B – Enhanced PCRE2 rules](./docs/39B%20-%20Decoder-PCRE2-BadBehavior-Regle-enrichie-Wazuh-2026-08-20.md)
+- [39A – BadBehavior decoders & rules](./docs/39A%20-%20BunkerWeb-BadBehavior-Wazuh-Decoders-Rules-2026-08-20.md)
+- [39B – PCRE2 decoder / enriched rule](./docs/39B%20-%20Decoder-PCRE2-BadBehavior-Regle-enrichie-Wazuh-2026-08-20.md)
 
 ---
 
@@ -131,7 +135,7 @@ Build a **reproducible, documented and defensible homelab bastion** following a 
 
 ---
 
-## Overall Status (20 August 2026)
+## Overall Status
 
 - [x] OPNsense firewall rebuilt and hardened  
 - [x] Suricata operational  
@@ -144,12 +148,18 @@ Build a **reproducible, documented and defensible homelab bastion** following a 
 - [x] Wazuh all-in-one SIEM  
 - [x] OPNsense Syslog → Wazuh  
 - [x] Wazuh Agent on admin workstation  
+- [x] WireGuard VPN (Road Warrior)  
+- [x] Encrypted backups + rotation (Daily 7 / Weekly 4)  
 - [x] BunkerWeb / Docker logs ingestion into Wazuh  
+<<<<<<< Updated upstream
 - [x] WireGuard VPN (Road Warrior) operational  
 - [x] Encrypted backups + daily/weekly rotation
 - [x] **41** – Page vitrine Horus AIS (`horus-ais.com`) + ancien index sur `isa.horus-ais.com`  
 - [ ] Real website content  
 - [ ] Email alerting (Fail2ban / Wazuh / OPNsense)  
+=======
+- [x] Real website content (landing page on `horus-ais.com`)  
+>>>>>>> Stashed changes
 
 ---
 
@@ -157,4 +167,3 @@ Build a **reproducible, documented and defensible homelab bastion** following a 
 > Repository: [Lu-Suy/Opnsense-homelab-security](https://github.com/Lu-Suy/Opnsense-homelab-security)
 
 **French version available here:** [README.fr.md](./README.fr.md)
-
