@@ -93,6 +93,10 @@ Dossier [`docs/`](./docs/) — captures dans [`images/`](./images/).
 - [17 – Checklist LUKS](./docs/17-Checklist-LUKS.md)
 - [18 – Migration règles MVC](./docs/18-Migration-Firewall-MVC-API.md)
 - [19 – Optimisation STUN/TURN](./docs/19-Optimisation-STUN-TURN.md)
+- [43 – Alertes email (Fail2ban + msmtp)](./docs/43%20-%20Alertes-email-Fail2ban-msmtp-2026-08-21.md)
+
+### DNS/Unbound
+- [42 – Forçage DNS / Anti-Tunneling](./docs/42%20-%20Forcage-DNS-Anti-Tunneling-OPNsense-2026-08-21.md)
 
 ### Migration bastion G4 (Rocky Linux)
 - [23 – Install réseau + premier SSH](./docs/23%20-%20Rocky%20Linux%20G4%20-%20install%20reseau%20et%20premier%20SSH.md)
